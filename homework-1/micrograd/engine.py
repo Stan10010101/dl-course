@@ -31,21 +31,19 @@ class Value:
         out = Value(self.data * other.data, (self, other), '*')
 
         def _backward():
-            self.grad += out.grad
-            other.grad += out.grad
+            self.grad += out.grad * other.data
+            other.grad += out.grad *self.data
 
         out._backward = _backward
 
         return out
 
     def __pow__(self, other: Union[int, float]) -> "Value":
-        assert isinstance(
-            other, (int, float)
-        ), "only supporting int/float powers for now"
-        out = Value(self.data ** other.data, (slef, other), '**')
+        assert isinstance(other, (int, float)), "only supporting int/float powers for now"
+        out = Value(self.data ** other, (self,), f'**{other}')
 
         def _backward():
-            self.grad += ...
+            self.grad += (other * self.data**(other-1)) * out.grad
 
         out._backward = _backward
 
@@ -61,10 +59,10 @@ class Value:
         return out
 
     def relu(self):
-        out = ...
+        out = Value(0 if self.data < 0 else self.data, (self,), 'ReLu')
 
         def _backward():
-            self.grad += ...
+            self.grad += (out.data >0) * out.grad
 
         out._backward = _backward
 
@@ -88,7 +86,7 @@ class Value:
         # go one variable at a time and apply the chain rule to get its gradient
         self.grad = 1
         for v in reversed(topo):
-            # YOUR CODE GOES HERE
+            v._backward()
 
     def __neg__(self):  # -self
         return self * -1
@@ -148,39 +146,55 @@ class Tensor:
         return Tensor(self.data + other)
 
     def __mul__(self, other):
-        return ...
+        if isinstance(other, Tensor):
+            assert self.shape() == other.shape()
+            return Tensor(np.multiply(self.data, other.data))
+        return Tensor(self.data * other)
     
     def __truediv__(self, other):
-        return ...
+        if isinstance(other, Tensor):
+            assert self.shape() == other.shape()
+            return Tensor(np.true_divide(self.data, other.data))
+        return Tensor(self.data / other)
     
     def __floordiv__(self, other):
-        return ...
+          if isinstance(other, Tensor):
+            assert self.shape() == other.shape()
+            return Tensor(np.floor_divide(self.data, other.data))
+        return Tensor(self.data // other)
     
     def __radd__(self, other):
-        return ...
+          if isinstance(other, Tensor):
+            assert self.shape() == other.shape()
+            return Tensor(np.__radd__(self.data, other.data))
+        return Tensor(other + self)
     
     def __rmull__(self, other):
-        return ...
+          if isinstance(other, Tensor):
+            assert self.shape() == other.shape()
+            return Tensor(np.__rmull__(self.data, other.data))
+        return Tensor(other * self)
 
     def exp(self):
-        return ...
+        return self.np.exp(self)
 
     def dot(self, other):
         if isinstance(other, Tensor):
-            return ...
-        return ...
+            assert self.shape() == other.shape()
+            return Tensor(np.dot(self.data, other.data))
+        return Tensor(self.data @ other)
 
     def shape(self):
         return self.data.shape
 
     def argmax(self, dim=None):
-        return ...
+        return self.np.argmax(self)
 
     def max(self, dim=None):
-        return ...
+        return self.np.max(self)
 
     def reshape(self, *args, **kwargs):
-        self.data = ...
+        self.data = self.data.reshape(args,kwargs)
         return self
 
     def backward(self):
