@@ -56,11 +56,11 @@ class ReLU(Module):
 class CrossEntropyLoss(Module):
     """Cross-entropy loss for multi-class classification"""
     def __init__(self):
-        q = super(ClassNLLCriterion, self)
+        a = super(ClassNLLCriterion, self)
         super(ClassNLLCriterion, self).__init__()
     
     def forward(self, inp, label):
         # Create CrossEntropy Loss Module
-        self.output = - np.mean(inp[np.arange(target.shape[0]), target])
+        self.output = - np.mean(inp[np.arange(label.shape[0]), label])
         return self.output
-        return ...
+        
