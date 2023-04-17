@@ -92,7 +92,7 @@ class Value:
         return self * -1
 
     def __radd__(self, other):  # other + self
-        return self + other
+        return other + self
 
     def __sub__(self, other):  # self - other
         return self + (-other)
@@ -101,7 +101,7 @@ class Value:
         return other + (-self)
 
     def __rmul__(self, other):  # other * self
-        return self * other
+        return other * self
 
     def __truediv__(self, other):  # self / other
         return self * other ** -1
